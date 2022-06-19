@@ -31,6 +31,17 @@ spring:
               args:
                 name: reservationServiceCircuitBreaker
                 fallbackUri: forward:/reservationServiceFallback
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestTokens: 1
+  redis:
+    connect-timeout: 30s
+    host: localhost
+    port: 6379
+    timeout: 1s
 
 resilience4j:
   circuitbreaker:
