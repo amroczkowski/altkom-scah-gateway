@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: gateway2
+  cloud:
+    gateway:
+      routes:
+        - id: owner-service
+          uri: lb://owner-service
+          predicates:
+            - Path=/owner/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ownerServiceCircuitBreaker
+                fallbackUri: forward:/ownerServiceFallback
+        - id: dog-service
+          uri: lb://dog-service
+          predicates:
+            - Path=/dog/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: dogServiceCircuitBreaker
+                fallbackUri: forward:/dogServiceFallback
+        - id: reservation-service
+          uri: lb://reservation-service
+          predicates:
+            - Path=/reservation/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: reservationServiceCircuitBreaker
+                fallbackUri: forward:/reservationServiceFallback
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      ownerServiceCircuitBreaker:
+        sliding-window-size: 4
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        automatic-transition-from-open-to-half-open-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,prometheus

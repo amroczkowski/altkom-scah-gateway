@@ -9,6 +9,10 @@ Content-Type: application/json
 
 ###
 
+GET http://localhost:8080/dog
+
+###
+
 POST http://localhost:8080/dog
 Content-Type: application/json
 
