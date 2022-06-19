@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: owner-service
+          uri: lb://owner-service
+          predicates:
+            - Path=/owner/**
+        - id: dog-service
+          uri: lb://dog-service
+          predicates:
+            - Path=/dog/**
+        - id: reservation-service
+          uri: lb://reservation-service
+          predicates:
+            - Path=/reservation/**
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info
