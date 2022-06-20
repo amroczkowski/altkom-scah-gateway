@@ -1,6 +1,21 @@
 spring:
   application:
     name: gateway2
+  main:
+    web-application-type: reactive
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak-provider:
+            issuer-uri: http://localhost:8081/auth/realms/app-realm
+        registration:
+          keycloak-gateway:
+            provider: keycloak-provider
+            client-id: gateway
+            client-secret: RqxV37NV51Vg9x3JUA4HaD3zrUTWS9gk
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
   cloud:
     gateway:
       routes:
