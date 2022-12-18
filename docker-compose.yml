@@ -143,8 +143,6 @@ services:
       KEYCLOAK_PASSWORD: admin
     ports:
       - '8081:8080'
-    networks:
-      - animalhotelnetwork
 
 networks:
   animalhotelnetwork:
