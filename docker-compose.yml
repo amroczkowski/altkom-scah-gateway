@@ -1,0 +1,150 @@
+version: "3.7"
+
+services:
+
+  altkom-scah-service-registry:
+#    image: animalhotel/serviceregistry:latest
+    build:
+      context: ../altkom-scah-service-registry
+      dockerfile: Dockerfile
+    ports:
+      - '8761:8761'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-config-server:
+#    image: animalhotel/configserver:latest
+    build:
+      context: ../altkom-scah-config-server
+      dockerfile: Dockerfile
+    ports:
+      - '8500:8080'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-gateway:
+#    image: animalhotel/gateway:latest
+    build:
+      context: ../altkom-scah-gateway
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    networks:
+      - animalhotelnetwork
+    depends_on:
+      - altkom-scah-config-server
+
+  altkom-scah-owner-service:
+#    image: animalhotel/ownerservice:latest
+    build:
+      context: ../altkom-scah-owner-service
+      dockerfile: Dockerfile
+    ports:
+      - '8200:8080'
+    networks:
+      - animalhotelnetwork
+    depends_on:
+      - altkom-scah-config-server
+      - altkom-scah-service-registry
+      - altkom-scah-owner-postgres
+  altkom-scah-owner-postgres:
+    image: postgres:13.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ownerdb
+    ports:
+      - '5200:5432'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-dog-service:
+#    image: animalhotel/dogservice:latest
+    build:
+      context: ../altkom-scah-dog-service
+      dockerfile: Dockerfile
+    ports:
+      - '8100:8080'
+    networks:
+      - animalhotelnetwork
+    depends_on:
+      - altkom-scah-config-server
+      - altkom-scah-service-registry
+      - altkom-scah-dog-postgres
+  altkom-scah-dog-postgres:
+    image: postgres:13.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dogdb
+    ports:
+      - '5100:5432'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-reservation-service:
+#    image: animalhotel/reservationservice:latest
+    build:
+      context: ../altkom-scah-reservation-service
+      dockerfile: Dockerfile
+    ports:
+      - '8300:8080'
+    networks:
+      - animalhotelnetwork
+    depends_on:
+      - altkom-scah-config-server
+      - altkom-scah-service-registry
+      - altkom-scah-reservation-postgres
+  altkom-scah-reservation-postgres:
+    image: postgres:13.2
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reservationdb
+    ports:
+      - '5300:5432'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-prometheus:
+    image: prom/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - C:/temp/prometheus-docker:/etc/prometheus
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-graphana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - '9411:9411'
+    networks:
+      - animalhotelnetwork
+
+  altkom-scah-keycloak:
+    image: jboss/keycloak
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+      - '8081:8080'
+    networks:
+      - animalhotelnetwork
+
+networks:
+  animalhotelnetwork:
